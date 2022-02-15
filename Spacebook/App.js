@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import React, { Component } from 'react';
-import {NativeBaseProvider, Box, Heading, Center, Stack, Icon, Input, FormControl, Image, Button} from 'native-base';
+import {NativeBaseProvider, Box, Heading, Center, Stack, Icon, Input, FormControl, Image, Button, Link, HStack} from 'native-base';
 import {MaterialIcons} from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -11,14 +11,17 @@ class Log_in_page extends Component {
 
   constructor(props) {
     super(props);
+    //this.stateStorer = this.stateStorer.bind(this);
     this.state = {loggedin: false};
   }
 
   checkLogin() {
     const authToken = async () =>{
       try {
-       await AsyncStorage.getItem('AUTHTOKEN');
-        if (authToken != null){
+       const token = await AsyncStorage.getItem('@AUTHTOKEN');
+        if (token != null){
+          this.setState({loggedin: true });
+          this.setState({AuthToken: token});
           //Needs to check against the API whether the key is active. if it is set logged in to true.
         }
         else {
@@ -28,17 +31,43 @@ class Log_in_page extends Component {
         console.log(e);
       }
     };
+    authToken();
   }
 
-  logIn() {
-
-  }
-
-  stateStorer(event = {}){
-    const compName = event.target && event.target.name;
-    const compVal = event.target && event.target.value;
-
-    this.setState({[compName]: compVal});
+  async logIn() {
+    const getToken = () => {
+      console.log(this.state.email);
+      console.log(this.state.password);
+      return fetch('http://10.0.2.2:3333/api/1.0.0/Login', {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email: this.state.email,
+          password: this.state.password
+        })
+      })
+      .then ((response) => response.json())
+      .then ((json) => {
+        this.setState({AuthToken: json.token});
+        return json.token;
+      })
+      //Said to sort out the async issue here.  Code is executing too late
+      .catch((error) => {
+        console.error(error);
+      });
+    };
+    getToken();
+    console.log(this.state.AuthToken);
+    try {
+        await AsyncStorage.setItem('@AUTHTOKEN', this.state.AuthToken);
+        console.log( await AsyncStorage.getItem('@AUTHTOKEN'));
+      }
+      catch (err) {
+        console.error(err);
+      }
   }
 
   render() {
@@ -50,7 +79,7 @@ class Log_in_page extends Component {
           <Input w={{
             base: "75%",
             md: "25%"
-          }} InputLeftElement={<Icon as={<MaterialIcons name="person" />} size={5} ml="2" color="light.600"/>} placeholder="Email" variant="rounded" value={this.state.email} onChangeText={this.stateStorer} name="Email"/>
+          }} InputLeftElement={<Icon as={<MaterialIcons name="person" />} size={5} ml="2" color="light.600"/>} placeholder="Email" variant="rounded"  onChangeText={(value) => this.setState({email: value})} name="Email"/>
         </Stack>
       </FormControl>
       <FormControl isRequired>
@@ -59,12 +88,39 @@ class Log_in_page extends Component {
           <Input w={{
             base: "75%",
             md: "25%"
-          }} InputRightElement={<Icon as={<MaterialIcons name="visibility-off" />} size={5} ml="2" color="light.600"/>} placeholder="password" variant="rounded" type="password" value={this.state.password} onChangeText={this.stateStorer} name="Password" />
+          }} InputRightElement={<Icon as={<MaterialIcons name="visibility-off" />} size={5} ml="2" color="light.600"/>} placeholder="Password" variant="rounded" type="password" onChangeText={(value) => this.setState({password: value})} name="Password" />
         </Stack>
 
       </FormControl>
-      <Button isLoading isLoadingText="Logging In" onPress={console.log('lolol')} alignSelf="center" colorScheme="light"> Log In</Button>
+      <Center alignSelf="center" md="5">
+      <Button alignSelf="center" colorScheme="light" onPress={() => this.logIn()}> Log In</Button>
+      </Center>
     </Center>
+    );
+  }
+}
+
+class Login_links extends Component {
+  constructor(props){
+    super(props);
+  }
+
+  openSignUp = () => {
+    console.log("Sign Up Pressed")
+  }
+
+  openPassReset = () => {
+    console.log("Reset Password")
+  }
+
+  render(){
+    return (
+      <Center alignSelf="center" mt="2">
+        <HStack space={5} justifyContent="center">
+          <Link onPress={this.openSignUp}>Sign Up</Link>
+          <Link>Forgotten Password?</Link>
+        </HStack>
+      </Center>
     );
   }
 }
@@ -76,6 +132,7 @@ function App() {
       <Center>
         <Image source={require('./assets/logo.png')} size="lg" resizeMode="center"/>
         <Log_in_page />
+        <Login_links />
       </Center>
     </NativeBaseProvider>
   );
