@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import {NativeBaseProvider, Box, Heading, Center, Stack, Icon, Input, FormControl, Image, Button, Link, HStack} from 'native-base';
 import {MaterialIcons} from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
 
 
 
@@ -12,40 +13,6 @@ class Log_in_page extends Component {
   constructor(props) {
     super(props);
     this.state = {loggedin: false};
-  }
-
-  checkLogin() {
-    const authToken = async () =>{
-      try {
-       const token = await AsyncStorage.getItem('@AUTHTOKEN');
-       const id = await AsyncStorage.getItem('@USERID');
-        if (token != null){
-          this.setState({loggedin: true });
-          this.setState({AuthToken: token});
-          const getLogin = async (...apitoken) => {
-            return await fetch('http://10.0.2.2:3333/api/1.0.0/User/' + JSON.parse(id), {
-              method: 'POST',
-              headers: {
-                Accept: 'application/json',
-                'X-Authorization': apitoken[0]
-              },
-            })
-            .then((response) => response.status())
-            .then((code) =>{
-              const statuscode = code;
-              return statuscode === 200 ?  true : false;
-            });
-          };
-          return getLogin(this.state.AuthToken) === true ? true : false;
-        }
-        else {
-          this.setState({loggedin: false }); //If the token is blank, then there is no logged in user.
-        }
-      } catch (e){
-        console.log(e);
-      }
-    };
-    authToken();
   }
 
   async logIn() {
@@ -82,6 +49,7 @@ class Log_in_page extends Component {
       });
     };
     await getToken();
+    this.navigation.navigate('Main');
     try {
         const jsonval = await AsyncStorage.getItem('@AUTHTOKEN');
         const idval = await AsyncStorage.getItem('@USERID');
@@ -118,7 +86,7 @@ class Log_in_page extends Component {
 
       </FormControl>
       <Center alignSelf="center" md="5">
-      <Button alignSelf="center" colorScheme="light" onPress={() => this.logIn()}> Log In</Button>
+      <Button alignSelf="center" colorScheme="light" onPress={() => this.logIn(this.props.navigation)}> Log In</Button>
       </Center>
     </Center>
     );
@@ -142,25 +110,27 @@ class Login_links extends Component {
     return (
       <Center alignSelf="center" mt="2">
         <HStack space={5} justifyContent="center">
-          <Link onPress={this.openSignUp}>Sign Up</Link>
-          <Link>Forgotten Password?</Link>
+          <Link onPress={this.openSignUp()}>Sign Up</Link>
+          <Link onPress={this.openPassReset()}>Forgotten Password?</Link>
         </HStack>
       </Center>
     );
   }
 }
 
-function LogIn() {
+export function LogIn(props) {
+  console.log('props: ' + this.props);
+  const navigation = useNavigation();
   return (
     <NativeBaseProvider>
       <Box alignSelf="center" bg="light.400" width="100%" height="5%"><Heading size="2xl" color="light.900" textAlign="center">Welcome to Spacebook</Heading></Box>
       <Center>
         <Image source={require('../assets/logo.png')} size="lg" resizeMode="center"/>
-        <Log_in_page />
+        <Log_in_page navigate={navigation}/>
         <Login_links />
       </Center>
     </NativeBaseProvider>
   );
 }
 
-export default LogIn;
+// export function LogIn;
