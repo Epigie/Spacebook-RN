@@ -48,12 +48,11 @@ function nav() {
   return (
     <NavigationContainer>
       <StackNav.Navigator>
-        {console.log(checkLogin())}
-        {checkLogin() === true ?
+        {/* {console.log(checkLogin())} */}
+        {/* {checkLogin() === true ? */}
         <StackNav.Screen name="Main" component={Main_Screen}/>
-        :
-        <StackNav.Screen name="Login" component={LogIn} initialParams={{'navigate':{StackNav}}}/>
-      }
+        <StackNav.Screen name="Login" component={LogIn} />
+      {/* } */}
       </StackNav.Navigator>
     </NavigationContainer>
   );

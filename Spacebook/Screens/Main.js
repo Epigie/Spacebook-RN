@@ -20,23 +20,20 @@ import Profile from './Profile.js';
 import Search from './Search.js';
 import Settings from './Settings.js';
 
+const Tab = createBottomTabNavigator();
 class Top_Tree extends Component {
   constructor(props) {
     super(props);
     this.state = {loggedin: false};
   }
 
-  Tab = createBottomTabNavigator();
-
   render() {
     return (
-      <NavigationContainer>
-        <this.Tab.Navigator>
-          <this.Tab.Screen name="Profile" component={Profile} />
-          <this.Tab.Screen name="Search" component={Search} />
-          <this.Tab.Screen name="Settings" component={Settings} />
-        </this.Tab.Navigator>
-      </NavigationContainer>
+      <Tab.Navigator>
+        <Tab.Screen name="Profile" component={Profile} />
+        <Tab.Screen name="Search" component={Search} />
+        <Tab.Screen name="Settings" component={Settings} />
+      </Tab.Navigator>
     );
   }
 }

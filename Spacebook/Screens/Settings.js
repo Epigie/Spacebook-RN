@@ -1,4 +1,5 @@
-import React, {Component, Text} from 'react';
+import React from 'react';
+import {Text} from 'react-native';
 
 function Settings() {
   return <Text>This is the Settings tab</Text>;

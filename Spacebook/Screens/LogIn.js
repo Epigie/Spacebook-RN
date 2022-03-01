@@ -118,9 +118,7 @@ class Login_links extends Component {
   }
 }
 
-export function LogIn(props) {
-  console.log('props: ' + this.props);
-  const navigation = useNavigation();
+export function LogIn({navigation}) {
   return (
     <NativeBaseProvider>
       <Box alignSelf="center" bg="light.400" width="100%" height="5%"><Heading size="2xl" color="light.900" textAlign="center">Welcome to Spacebook</Heading></Box>
@@ -128,6 +126,7 @@ export function LogIn(props) {
         <Image source={require('../assets/logo.png')} size="lg" resizeMode="center"/>
         <Log_in_page navigate={navigation}/>
         <Login_links />
+        <Button onPress={() => navigation.navigate("Main")} title='Test'/>
       </Center>
     </NativeBaseProvider>
   );
