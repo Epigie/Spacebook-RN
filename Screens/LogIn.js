@@ -122,8 +122,8 @@ class Login_links extends Component {
     return (
       <Center alignSelf="center" mt="2">
         <HStack space={5} justifyContent="center">
-          <Link onPress={this.openSignUp()}>Sign Up</Link>
-          <Link onPress={this.openPassReset()}>Forgotten Password?</Link>
+          <Link onPress={() => this.openSignUp()}>Sign Up</Link>
+          <Link onPress={() => this.openPassReset()}>Forgotten Password?</Link>
         </HStack>
       </Center>
     );
@@ -133,7 +133,7 @@ class Login_links extends Component {
 export function LogIn({navigation}) {
   return (
     <NativeBaseProvider>
-      <Box alignSelf="center" bg="light.400" width="100%" height="10%"><Heading size="2xl" color="light.900" textAlign="center">Welcome to Spacebook</Heading></Box>
+      <Box alignSelf="center" bg="darkBlue.900" width="100%" height="10%"><Heading size="2xl" color="light.100" textAlign="center">Welcome to Spacebook</Heading></Box>
       <Center>
         <Image source={require('../assets/logo.png')} size="lg" resizeMode="center"/>
         <Log_in_page navigation={navigation}/>
@@ -143,4 +143,3 @@ export function LogIn({navigation}) {
   );
 }
 
-// export function LogIn;
