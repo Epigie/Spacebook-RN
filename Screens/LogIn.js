@@ -1,10 +1,10 @@
 /* eslint-disable prettier/prettier */
 import React, { Component } from 'react';
 import {Alert} from 'react-native';
-import {NativeBaseProvider, Box, Heading, Center, Stack, Icon, Input, FormControl, Image, Button, Link, HStack} from 'native-base';
+import {NativeBaseProvider, Box, Heading, Center, Stack, Icon, Input, FormControl, Image, Button, Link, HStack, AlertDialog} from 'native-base';
 import {MaterialIcons} from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation } from '@react-navigation/native';
+
 
 
 
@@ -13,8 +13,18 @@ class Log_in_page extends Component {
 
   constructor(props) {
     super(props);
-    this.state = {loggedin: false};
+    this.ref=React.createRef();
+    this.state = {
+      loggedin: false,
+      errorOpen: false,
+      errorDialog: ''
+    };
   }
+
+  uhOhError = (error) =>{
+    this.setState({errorOpen : true, errorDialog: error})
+    throw(error);
+}
 
 
 
@@ -57,7 +67,7 @@ class Log_in_page extends Component {
         }
         this.props.navigation.navigate('Main');
       } else{
-        throw 'Incorrect User or Password'
+        this.uhOhError('Incorrect User or Password')
       }
     })
     .catch((error) => {
@@ -78,6 +88,15 @@ class Log_in_page extends Component {
   render() {
     return (
     <Center mt="5" mb="5" alignSelf="center" bg="light.100" width="75%" rounded="lg">
+      <AlertDialog leastDestructiveRef={this.ref} isOpen={this.state.errorOpen} onClose={() => this.setState({errorOpen: false, errorDialog: ''})}>
+          <AlertDialog.Content>
+            <AlertDialog.Header fontSize={'lg'} fontWeight={'bold'}>Error!</AlertDialog.Header>
+            <AlertDialog.Body>{this.state.errorDialog}</AlertDialog.Body>
+            <AlertDialog.Footer>
+              <Button cancelRef={this.ref} colorScheme={'danger'} onPress={() => this.setState({errorOpen: false, errorDialog: ''})}>Okay</Button>
+            </AlertDialog.Footer>
+          </AlertDialog.Content>
+        </AlertDialog>
       <FormControl isRequired>
       <FormControl.Label ml="5" mt="2">E-mail</FormControl.Label>
         <Stack space={5} w="80%" alignItems="center" alignSelf="center">
@@ -131,12 +150,13 @@ class Login_links extends Component {
 }
 
 export function LogIn({navigation}) {
+
   return (
     <NativeBaseProvider>
       <Box alignSelf="center" bg="darkBlue.900" width="100%" height="10%"><Heading size="2xl" color="light.100" textAlign="center">Welcome to Spacebook</Heading></Box>
       <Center>
         <Image source={require('../assets/logo.png')} size="lg" resizeMode="center"/>
-        <Log_in_page navigation={navigation}/>
+        <Log_in_page navigation={navigation} />
         <Login_links />
       </Center>
     </NativeBaseProvider>

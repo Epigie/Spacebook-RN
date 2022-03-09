@@ -11,14 +11,18 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const StackNav = createStackNavigator();
 
 function nav() {
+  const [isOpen, setIsOpen] = React.useState(false);
+  const [errorDialog, setErrorDialog] = React.useState('');
+  const cancelRef = null
+  const closeError = () =>{
+      setIsOpen(false);
+      setErrorDialog('');
+    }
   return (
     <NavigationContainer>
       <StackNav.Navigator screenOptions={{ headerShown: false }}>
-        {/* {console.log(checkLogin())} */}
-        {/* {checkLogin() === true ? */}
         <StackNav.Screen name="Main" component={Main} />
-        <StackNav.Screen name="Login" component={LogIn} />
-      {/* } */}
+        <StackNav.Screen name="Login" component={LogIn} isOpen={isOpen} setIsOpen={setIsOpen} errorDialog={errorDialog} setErrorDialog={setErrorDialog} ref={cancelRef} closeError={closeError}/>
       </StackNav.Navigator>
     </NavigationContainer>
   );
