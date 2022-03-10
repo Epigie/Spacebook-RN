@@ -42,11 +42,8 @@ class Search extends Component {
     })
     .then( async (response) => {
       const code = response.status
-      console.log(response);
       if(code === 200){
-        console.log('searched')
         const jsonbody = await response.json();
-        console.log(jsonbody)
         this.setState({results : jsonbody}, () => this.setState({isLoading: false}));
       }
       else{
@@ -129,7 +126,6 @@ class Search extends Component {
       const code = response.status
       if(code === 201){
         this.setState({post: null})
-        console.log('Post Worked!')
         await this.retrievePosts(id,0);
       }
       else{
@@ -159,14 +155,12 @@ class Search extends Component {
     })
     .then( async (response) => {
       const code = response.status
-      console.log(response);
       if(code === 200){
         let arr = [];
         const jsonbody = await response.json();
         for (let entry in jsonbody) {
           arr.push(jsonbody[entry].user_id)
         }
-        console.log('array' + arr);
         this.setState({myFriends : arr});
       }
       else{
@@ -252,7 +246,7 @@ class Search extends Component {
             <Text>Search for a person:</Text>
             <HStack space={2} w='100%' justifyContent={'center'} alignItems='center'>
               <Input borderColor={'darkBlue.900'} borderWidth={2} InputLeftElement={<Ionicons name='search-circle' color='black' size={'xl'}/>} placeholder="One small step for man..."   onChangeText={(value) => this.setState({search: value})} name="Name"/>
-              <Button  alignSelf={'bottom'} colorScheme='darkBlue' onPress={() => {this.searchPeople(this.state.search); console.log(this.state.results)}}>Search</Button>
+              <Button  alignSelf={'bottom'} colorScheme='darkBlue' onPress={() => {this.searchPeople(this.state.search)}}>Search</Button>
               </HStack>
             </VStack>
         </Box>

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {NativeBaseProvider, Box, Heading, Center, Button, Avatar, Pressable, TextArea, FlatList, Text, ScrollView, Modal, AlertDialog} from 'native-base';
+import {NativeBaseProvider, Box, Heading, Center, Button, Avatar, Pressable, TextArea, FlatList, Text, ScrollView, Modal, AlertDialog, VStack} from 'native-base';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import * as DocumentPicker from 'expo-document-picker';
@@ -47,7 +47,6 @@ class Profile extends Component {
   //Modal Function for child components
 
   openEdit = (value, post) => {
-    console.log('opening model');
     this.setState({showEdit : value, editPost: post});
   }
 
@@ -59,7 +58,6 @@ class Profile extends Component {
     const res = await fetch(Pic.uri);
     const blob = await res.blob();
     this.setState({newPic : Pic.uri, picBlob: blob, picType : Pic.mimeType })
-    console.log('file is: \n'+ Pic.uri);
   }
 
   uploadPhoto = async (photoblob, picType) => {
@@ -74,7 +72,6 @@ class Profile extends Component {
     .then( async (response) => {
       const code = response.status
       if(code === 200){
-        console.log("Success")
         this.setState({newPic : null, picBlob: null});
         window.location.reload(false);
       }
@@ -154,7 +151,6 @@ class Profile extends Component {
       if(code === 201){
         this.setState({post: null})
         window.location.reload(false)
-        console.log('Post Worked!')
       }
       else{
         if(code === 403){
@@ -245,6 +241,16 @@ class Profile extends Component {
     return(<Post postID={item.post_id} text={item.text} timeStamp={item.timestamp} userID={item.author.user_id} fName={item.author.first_name} lName={item.author.last_name} likes={item.numLikes} navigation={this.props.navigation} AuthToken={this.state.AuthToken} RefreshFlatList={this.RefreshFlatList} openModel={this.openEdit} wallID={this.state.id} uhOhError={this.uhOhError}/>);
   }
 
+  getNumPost = (val) =>{
+    if(val === undefined){
+      return 0;
+    }
+    else{
+      const number = Object.keys(val).length;
+      return number;
+    }
+  }
+
   
 
 
@@ -262,7 +268,6 @@ class Profile extends Component {
           </AlertDialog.Content>
         </AlertDialog>
         <Box alignSelf="center" bg="darkBlue.900" width="100%" height="10%" justifyContent='center'><Heading size="xl" color="light.100" textAlign="left" ml='2'>Your Profile</Heading></Box>
-        {console.log(this.state.last_name)}
         <Heading alignSelf='center' color='light.900'>{this.state.First_name != null ? this.state.First_name: 'Unknown, Are you logged in?'} {this.state.Last_name != null ? this.state.Last_name: ''}</Heading>
         <Center alignSelf='center' alignItems='center' mt='2' width='50%'>
           <Pressable onPress={() => this.setState({showPMenu : true})}><Avatar borderWidth='2' borderColor='darkBlue.900'source={{uri: this.state.ProfilePicture,}} size="2xl" resizeMode="center" /></Pressable>
@@ -299,6 +304,7 @@ class Profile extends Component {
           </Modal.Content>
           </Modal>
         <ScrollView width='100%'>
+          {this.getNumPost(this.state.postData) == 0? <VStack alignSelf={'center'}><Text fontSize="l" color="light.900" textAlign="center" bold>No Posts!</Text><Ionicons name='help' style={{'fontSize':128}} color='DarkBlue'></Ionicons></VStack>: <></>}
           <FlatList extraData={this.state} data={this.state.postData} renderItem={this.renderPost} keyExtractor={item => item.post_id} />
         </ScrollView>
       </NativeBaseProvider>

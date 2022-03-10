@@ -33,7 +33,6 @@ class Post extends Component{
       .then( async (response) => {
         const code = response.status
         if(code === 200){
-          console.log('delete:' + this.state.postID)
           this.props.RefreshFlatList();
         }
         else{
@@ -61,7 +60,6 @@ class Post extends Component{
         const code = response.status
         if(code === 200){
           const jsonbody = await response.json();
-          console.log(jsonbody)
           const postID = jsonbody.post_id;
           const text = jsonbody.text;
           const timeStamp = jsonbody.timestamp;
@@ -96,7 +94,6 @@ class Post extends Component{
       })
       .then( async (response) => {
         const code = response.status
-        console.log(response);
         if(code === 200){
           const blob = await response.blob();
           const base64image = URL.createObjectURL(blob);
@@ -125,7 +122,6 @@ class Post extends Component{
         const code = response.status
         if(code === 200){
           this.setState({isLiked : false, likes: this.state.likes-1});
-          console.log('Like removed for post ' + this.state.postID)
         }
         else{
           this.props.uhOhError('Something has gone wrong removing the like,  was it even liked? Are you on your own wall?');
@@ -148,7 +144,6 @@ class Post extends Component{
         const code = response.status
         if(code === 200){
           this.setState({isliked : true, likes: this.state.likes+1});
-          console.log('Like added for post ' + this.state.postID)
         }
         if(code === 403 || code === 400){
           await this.deleteLike();

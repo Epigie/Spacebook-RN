@@ -25,14 +25,13 @@ class Result extends Component {
       })
       .then( async (response) => {
         const code = response.status
-        console.log(response);
         if(code === 200){
           const blob = await response.blob();
           const base64image = URL.createObjectURL(blob);
           this.setState({ProfilePicture : base64image});
         }
         else{
-          throw('Something has gone wrong grabbing the users profile picture.');
+          this.props.uhOhError('Something has gone wrong grabbing the users profile picture.');
         }
       })
       .catch((error) =>{
@@ -59,14 +58,11 @@ class Result extends Component {
       })
       .then( async (response) => {
         const code = response.status
-        console.log(response);
-        console.log(code);
         if(code === 201){
-          console.log('added friend');
           this.setState({frSent : true});
         }
         else{
-          throw('Something has gone wrong adding the friend.');
+            this.props.uhOhError('Something has gone wrong adding the friend.');
         }
       })
       .catch((error) =>{
@@ -83,14 +79,11 @@ class Result extends Component {
       })
       .then( async (response) => {
         const code = response.status
-        console.log(response);
-        console.log(code);
         if(code === 200){
-          console.log('remove friend');
           this.setState({frSent : false, friends: false});
         }
         else{
-          throw('Something has gone wrong deleting the friend.');
+            this.props.uhOhError('Something has gone wrong deleting your friend! Please try again.');
         }
       })
       .catch((error) =>{
@@ -103,7 +96,7 @@ class Result extends Component {
       const id = await AsyncStorage.getItem('@USERID');
       const token = await AsyncStorage.getItem('@AUTHTOKEN');
       const ownPost = this.state.userID == id
-      this.setState({id : id, AuthToken : token});
+      this.setState({id : id, AuthToken : token, ownPost: ownPost});
       this.retrieveProfilePicture();
     }
   
