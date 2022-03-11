@@ -11,7 +11,7 @@ class Post extends Component{
         isliked: false, //This is actually useless due to the API not being able to tell the client whether a user has liked a post without first either liking or deleting the like.
         postID: this.props.postID,
         text: this.props.text,
-        time: moment(this.props.timeStamp).tz('Europe/London').format('hh:MM A'),
+        time: moment(this.props.timeStamp).tz('Europe/London').format('hh:mm A'),
         date: moment(this.props.timeStamp).tz('Europe/London').format('MM/DD/YYYY'),
         userID: this.props.userID,
         fName: this.props.fName,
@@ -170,20 +170,20 @@ class Post extends Component{
     render(){
       return(
         <Box borderBottomWidth='2' borderColor='darkBlue.600' >
-          <HStack space={3} justifyContent='flex-start'>
+          <HStack justifyContent='flex-start'>
             <Box justifyContent='center' marginLeft={3} paddingTop={2} paddingBottom={2}>
             <Avatar size='xl' source={{
               uri: this.state.ProfilePicture
             }} borderWidth='2' borderColor='darkBlue.600' />
             </Box>
             <VStack width='30%'>
-              <Text color='dark.50' fontSize='xl' bold>{this.state.fName} {this.state.lName}</Text>
-              <Text fontSize='m' color='dark.100'>{this.state.text}</Text>
-              <HStack space={2} justifyContent='space-evenly'>
-                {this.state.ownPost !== true ? <IconButton onPress={() => this.likePost() } icon={<Ionicons name={this.state.isliked === false ? 'heart-outline' : 'heart'} color='red' />}/> : <></>}
+              <Text ml={5} color='dark.50' fontSize='xl' bold>{this.state.fName} {this.state.lName}</Text>
+              <Text ml={5} fontSize='m' color='dark.100'>{this.state.text}</Text>
+              {this.state.ownPost !== true ? <IconButton mt={'auto'} alignSelf={'center'} mb={2} onPress={() => this.likePost() } icon={<Ionicons name={this.state.isliked === false ? 'heart-outline' : 'heart'} color='red' />}/> : <></>}
+              </VStack>
+              <HStack  justifyContent='space-evenly' mt={'auto'} mb={2}>
                 <Text color='red.700' bold>{this.state.likes} Likes</Text>
               </HStack>
-              </VStack>
               <VStack  marginLeft='auto' alignItems={'center'}>
                   {this.state.ownPost == true? <Menu placement='left' trigger={triggerProps => {
                   return <Pressable accessibilityLabel="More options menu" {...triggerProps}>

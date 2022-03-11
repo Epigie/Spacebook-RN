@@ -50,6 +50,61 @@ class Main extends Component {
       })
   }
 
+  //Post Functions
+  postScheduled = async (id,token) => {
+    const scheduled = await AsyncStorage.getItem('@scheduledPosts')
+    let finaljson;
+    if(scheduled == null || scheduled == undefined){
+      console.log('no posts scheduled')
+    }else{
+      console.log(scheduled)
+      let objarr = JSON.parse(scheduled);
+      console.log('len: ' + objarr['posts'].length)
+      console.log(objarr);
+      for(var i=(objarr['posts'].length-1); i > -1; i--){
+        console.log('entry ' +i)
+        let postDate = Date.parse(objarr['posts'][i]['date']);
+        let currDate = new Date().getTime();
+        let post = objarr['posts'][i]['post']
+        console.log('post:'+ postDate +'\n cur:+ '+currDate+'\n'+post+'\n sub: '+(currDate-postDate))
+        if(currDate-postDate >= 0){
+          console.log('POST SCHEDULED')
+          await fetch('http://localhost:3333/api/1.0.0/user/'+id+'/post', {
+            method: 'POST',
+            headers: {
+              'X-Authorization' : token,
+              'Content-Type' : 'application/json'
+            },
+            body: JSON.stringify({'text': objarr['posts'][i]['post']})
+          })
+          .then( async (response) => {
+            const code = response.status;
+            if(code === 201){
+              console.log("posted scheduled post!")
+              objarr['posts'].splice(i,1)
+              console.log('final arr: ' + objarr)
+            }
+            else{
+              if(code === 403){
+                throw('You do not have permission to post this wall');
+              }
+              else{
+                throw('Something has gone wrong posting to the wall!');
+              }
+            }
+          })
+          .catch((error) =>{
+            console.error(error);
+          })
+      }
+    }
+    console.log('outside loop:' +  JSON.stringify(objarr));
+    if(objarr != undefined){
+      await AsyncStorage.setItem('@scheduledPosts', JSON.stringify(objarr));
+    }
+  }
+}
+
   getLogin = async (id, token) => {
     if(token !== null){
       try{
@@ -96,7 +151,7 @@ class Main extends Component {
         this.props.navigation.navigate('Login');
     }
     else{
-      this.setState({AuthToken : value, id : id}, () => {this.getLogin(this.state.id, this.state.AuthToken); this.getFriendReq(this.state.id, this.state.AuthToken)});
+      this.setState({AuthToken : value, id : id}, () => {this.getLogin(this.state.id, this.state.AuthToken); this.getFriendReq(this.state.id, this.state.AuthToken); this.postScheduled(this.state.id, this.state.AuthToken)});
     }
   };
 
