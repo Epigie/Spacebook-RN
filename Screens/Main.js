@@ -52,23 +52,19 @@ class Main extends Component {
 
   //Post Functions
   postScheduled = async (id,token) => {
-    const scheduled = await AsyncStorage.getItem('@scheduledPosts')
+    const scheduled = await AsyncStorage.getItem('@storedPosts')
     let finaljson;
     if(scheduled == null || scheduled == undefined){
-      console.log('no posts scheduled')
     }else{
-      console.log(scheduled)
       let objarr = JSON.parse(scheduled);
-      console.log('len: ' + objarr['posts'].length)
-      console.log(objarr);
       for(var i=(objarr['posts'].length-1); i > -1; i--){
-        console.log('entry ' +i)
+        if(objarr['posts'][i]['date'] == 'None' || objarr['posts'][i]['date'] == undefined || objarr['posts'][i]['date'] == null){
+          continue;
+        }
         let postDate = Date.parse(objarr['posts'][i]['date']);
         let currDate = new Date().getTime();
         let post = objarr['posts'][i]['post']
-        console.log('post:'+ postDate +'\n cur:+ '+currDate+'\n'+post+'\n sub: '+(currDate-postDate))
         if(currDate-postDate >= 0){
-          console.log('POST SCHEDULED')
           await fetch('http://localhost:3333/api/1.0.0/user/'+id+'/post', {
             method: 'POST',
             headers: {
@@ -80,9 +76,7 @@ class Main extends Component {
           .then( async (response) => {
             const code = response.status;
             if(code === 201){
-              console.log("posted scheduled post!")
               objarr['posts'].splice(i,1)
-              console.log('final arr: ' + objarr)
             }
             else{
               if(code === 403){
@@ -98,9 +92,8 @@ class Main extends Component {
           })
       }
     }
-    console.log('outside loop:' +  JSON.stringify(objarr));
     if(objarr != undefined){
-      await AsyncStorage.setItem('@scheduledPosts', JSON.stringify(objarr));
+      await AsyncStorage.setItem('@storedPosts', JSON.stringify(objarr));
     }
   }
 }

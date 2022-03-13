@@ -63,7 +63,7 @@ class Post extends Component{
           const postID = jsonbody.post_id;
           const text = jsonbody.text;
           const timeStamp = jsonbody.timestamp;
-          const time = moment(Date(timeStamp)).format('hh:MM');
+          const time = moment(Date(timeStamp)).format('hh:mm');
           const date = moment(Date(timeStamp)).format('MM/DD/YYYY');
           const userID = jsonbody.author.user_id;
           const fName = jsonbody.author.first_name;
@@ -179,12 +179,9 @@ class Post extends Component{
             <VStack width='30%'>
               <Text ml={5} color='dark.50' fontSize='xl' bold>{this.state.fName} {this.state.lName}</Text>
               <Text ml={5} fontSize='m' color='dark.100'>{this.state.text}</Text>
-              {this.state.ownPost !== true ? <IconButton mt={'auto'} alignSelf={'center'} mb={2} onPress={() => this.likePost() } icon={<Ionicons name={this.state.isliked === false ? 'heart-outline' : 'heart'} color='red' />}/> : <></>}
+              {this.state.ownPost != true ? <IconButton mt={'auto'} alignSelf={'center'} mb={2} onPress={() => this.likePost() } icon={<Ionicons name={this.state.isliked == false ? 'heart-outline' : 'heart'} color='red' />}/> : <></>}
               </VStack>
-              <HStack  justifyContent='space-evenly' mt={'auto'} mb={2}>
-                <Text color='red.700' bold>{this.state.likes} Likes</Text>
-              </HStack>
-              <VStack  marginLeft='auto' alignItems={'center'}>
+              <VStack justifyContent='space-evenly' mt={'auto'} mb={2} marginLeft='auto' marginRight={10} alignItems={'center'}>
                   {this.state.ownPost == true? <Menu placement='left' trigger={triggerProps => {
                   return <Pressable accessibilityLabel="More options menu" {...triggerProps}>
                           <HamburgerIcon />
@@ -196,6 +193,7 @@ class Post extends Component{
                 
                 <Text  color='dark.50'>{this.state.time}</Text>
                 <Text  color='dark.50'>{this.state.date}</Text>
+                <Text color='red.700' bold>{this.state.likes} Likes</Text>
             </VStack>
   
           </HStack>

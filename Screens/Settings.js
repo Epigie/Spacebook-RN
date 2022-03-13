@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import {NativeBaseProvider, Box, Heading, Button, HStack, Image, Text, ScrollView, Modal, Input, AlertDialog, VStack} from 'native-base';
+import {NativeBaseProvider, Box, Heading, Button, HStack, Image, Text, ScrollView, Modal, Input, AlertDialog, VStack, FlatList} from 'native-base';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import Draft from '../assets/Draft';
 
 
 
@@ -12,21 +13,33 @@ class Settings extends Component{
     this.state = {
      showCMenu : false,
      showPMenu : false,
+     showDMenu : false,
      errorOpen : false,
      errorDialog : '',
     }
   }
 
-  uhOhError = (error) =>{
-    this.setState({errorOpen : true, errorDialog: error})
-    throw(error);
+  uhOhError = (error, tc) =>{
+    this.setState({errorOpen : true, errorDialog: error});
+    if(tc == null){
+      throw(error)
+    }
 }
 
 
   storeValues = async () =>{
     const id = await AsyncStorage.getItem('@USERID');
     const token = await AsyncStorage.getItem('@AUTHTOKEN');
+    const drafts = await AsyncStorage.getItem('@storedPosts');
+    const draftjson = JSON.parse(drafts)
+    draftjson != null? this.setState({drafts:draftjson['posts']}):this.setState({drafts:null})
     this.setState({id : id, AuthToken : token});
+  }
+
+  refreshDrafts = async () =>{
+    const drafts = await AsyncStorage.getItem('@storedPosts');
+    const draftjson = JSON.parse(drafts)
+    this.setState({drafts : draftjson['posts']});
   }
 
   checkFocus = async () => {
@@ -104,6 +117,35 @@ class Settings extends Component{
         
   }
 
+  deleteDraft = async (postID) =>{
+    this.setState({drafts:null})
+    let json;
+    let newarr = {'posts':[]}
+    const currDrafts = await AsyncStorage.getItem('@storedPosts')
+    const objarr = JSON.parse(currDrafts)
+    objarr['posts'].splice((postID-1),1);
+    for(var i=0; i<objarr['posts'].length;i++){
+      newarr['posts'].push({'id':(i+1), 'date':objarr['posts'][i]['date'], 'post':objarr['posts'][i]['post'] })
+    }
+    json = JSON.stringify(newarr)
+    await AsyncStorage.setItem('@storedPosts', json)
+    this.refreshDrafts();
+  }
+
+  EditDraft = async (postID, date, text) =>{
+    let json;
+    const currDrafts = await AsyncStorage.getItem('@storedPosts')
+    const objarr = JSON.parse(currDrafts)
+    objarr['posts'].splice((postID-1),1,{'id':postID, 'date': date, 'post': text} );
+    json = JSON.stringify(objarr)
+    await AsyncStorage.setItem('@storedPosts', json)
+    this.setState({drafts:null}, ()=>{this.refreshDrafts();})
+  }
+
+  renderDraft = ({item}) => {
+    return(<Draft id={item.id} text={item.post} datetime={item.date} refreshDrafts={this.refreshDrafts} uhOhError={this.uhOhError} deleteDraft={this.deleteDraft} AuthToken={this.state.AuthToken} userID={this.state.id} editDraft={this.EditDraft}/>);
+  }
+
   logout = () =>{
     fetch('http://localhost:3333/api/1.0.0/logout', {
       method: 'POST',
@@ -177,10 +219,22 @@ class Settings extends Component{
                 </Modal.Body>
               </Modal.Content>
             </Modal>
+            <Modal isOpen={this.state.showDMenu} onClose={() => this.setState({showDMenu: false})}>
+            <Modal.Content maxWidth='400px' marginBottom={'auto'} mt={5}>
+                <Modal.CloseButton />
+                <Modal.Header>Edit Drafts</Modal.Header>
+                <Modal.Body>
+                  <ScrollView>
+                    <FlatList extradata={this.state} data={this.state.drafts} renderItem={this.renderDraft}></FlatList>
+                    </ScrollView>
+                </Modal.Body>
+              </Modal.Content>
+            </Modal>
         <Box alignSelf="center" bg="darkBlue.900" width="100%" height="10%" justifyContent='center'><Heading size="xl" color="light.100" textAlign="left" ml='2'>Settings</Heading></Box>
         <VStack mb={10} mt={10}space={3} alignSelf={'center'} width='100%' justifyContent={'center'} alignItems={'center'}>
           <Button colorScheme={'darkBlue'} variant={'subtle'} width={'90%'} onPress={() =>{this.setState({showCMenu : true})}}>Edit Your Profile</Button>
           <Button colorScheme={'darkBlue'} variant={'subtle'} width={'90%'} onPress={() =>{this.setState({showPMenu : true})}}>Change Your Password</Button>
+          <Button colorScheme={'darkBlue'} variant={'subtle'} width={'90%'} onPress={() =>{this.state.drafts != null? this.setState({showDMenu : true}):this.uhOhError('You do not have any drafts!',false)}}>Edit Your Drafts</Button>
           <Button colorScheme={'danger'} variant={'subtle'} width={'90%'} onPress={() =>{this.logout()}}>Log Out</Button>
 
         </VStack>

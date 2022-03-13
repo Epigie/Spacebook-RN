@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {NativeBaseProvider, Box, Heading, Center, Button, Avatar, Pressable, TextArea, FlatList, Text, ScrollView, Modal, AlertDialog, VStack, HStack, IconButton, Popover, Spinner} from 'native-base';
+import {NativeBaseProvider, Box, Heading, Center, Button, Avatar, Pressable, TextArea, FlatList, Text, ScrollView, Modal, AlertDialog, VStack, HStack, Tooltip, IconButton, Popover, Spinner} from 'native-base';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import DateTimePicker from 'react-datetime-picker';
@@ -22,6 +22,7 @@ class Profile extends Component {
       newPic : null,
       showCal: false,
       schedulePostDate: null,
+      showDraft: false,
     }
   }
 
@@ -138,23 +139,44 @@ class Profile extends Component {
     })
   }
 
+  saveDraft = async (id,text,) => {
+    let json;
+    const date = this.state.schedulePostDate != null? this.state.schedulePostDate:'None'
+    const currDrafts = await AsyncStorage.getItem('@storedPosts')
+    if (currDrafts != null || currDrafts != undefined){
+      const objarr = JSON.parse(currDrafts)
+      objarr['posts'].push({'id': (objarr['posts'].length + 1),'date' : date, 'post' : text})
+      json = JSON.stringify(objarr)
+    } else{
+      const str = {'posts':[{'id':1,'date':date, 'post':text}]}
+      json=JSON.stringify(str)
+    }
+    await AsyncStorage.setItem('@storedPosts', json)
+    this.setState({showDraft:true, post : null}, () => {
+      this.postBox.clear();
+      this.editBox.clear();
+    })
+  }
+
   //Post Functions
   postToWall = async (id) => {
     let json;
     if(this.state.schedulePostDate != null){
-      const scheduled = await AsyncStorage.getItem('@scheduledPosts')
-      console.log(scheduled)
-      if (scheduled !== null && scheduled !== undefined){
+      const scheduled = await AsyncStorage.getItem('@storedPosts')
+      const thedate = this.state.schedulePostDate != null? this.state.schedulePostDate : 'None' 
+      if (scheduled != null || scheduled != undefined){
         const objarr = JSON.parse(scheduled)
-        objarr['posts'].push({'date' : this.state.schedulePostDate, 'post' : this.state.post })
+        objarr['posts'].push({'id': (objarr['posts'].length + 1),'date' : thedate, 'post' : this.state.post })
         json = JSON.stringify(objarr)
       } else{
-        const str = {'posts':[{'date':this.state.schedulePostDate,'post':this.state.post}]}
-        //const obj = JSON.parse(str)
+        const str = {'posts':[{'id': 1 ,'date':thedate,'post':this.state.post}]}
         json = JSON.stringify(str)
       }
-      await AsyncStorage.setItem('@scheduledPosts', json)
-      this.setState({showScheduled:true})
+      await AsyncStorage.setItem('@storedPosts', json)
+      this.setState({showScheduled:true, post: null}, () => {
+        this.postBox.clear();
+        this.editBox.clear();
+      })
 
     }else{
       fetch('http://localhost:3333/api/1.0.0/user/'+id+'/post', {
@@ -316,6 +338,15 @@ class Profile extends Component {
                 </Modal.Body>
               </Modal.Content>
             </Modal>
+            <Modal isOpen={this.state.showDraft} onClose={() => this.setState({showDraft: false})}>
+            <Modal.Content maxWidth='400px'>
+                <Modal.CloseButton />
+                <Modal.Header>Your Post has been saved to drafts</Modal.Header>
+                <Modal.Body>
+                  <Button onPress={() => this.setState({showDraft : false})} colorScheme='darkBlue' >Okay</Button>
+                </Modal.Body>
+              </Modal.Content>
+            </Modal>
           <Text alignSelf='center'>Email: {this.state.Email != null ? this.state.Email : 'Unknown'}</Text>
           <TextArea ref={input => { this.postBox = input }} borderColor='darkBlue.900' borderWidth='2' mt='5' placeholder='What`s on your mind?' w={{
             base: '100%'
@@ -330,10 +361,13 @@ class Profile extends Component {
                   <Popover.CloseButton />
                   <Popover.Header>Schedule Post</Popover.Header>
                   <Popover.Body>
-                    <DateTimePicker onChange={(value) => {this.setState({schedulePostDate : value}); console.log(value)}} />
+                    <DateTimePicker onChange={(value) => {this.setState({schedulePostDate : value})}} />
                   </Popover.Body>
                 </Popover.Content>
               </Popover>
+              <Tooltip label='Click to save post to drafts'>
+              <IconButton onPress={() => this.saveDraft(this.state.id, this.state.post)} icon={<Ionicons name={'archive'} color='darkblue' size='large' />} />
+              </Tooltip>
             </HStack>
         </Center>
         <Box width='100%' borderBottomWidth='2' borderColor='darkBlue.600'>

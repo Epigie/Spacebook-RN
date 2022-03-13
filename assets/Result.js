@@ -25,7 +25,7 @@ class Result extends Component {
       })
       .then( async (response) => {
         const code = response.status
-        if(code === 200){
+        if(code == 200){
           const blob = await response.blob();
           const base64image = URL.createObjectURL(blob);
           this.setState({ProfilePicture : base64image});
@@ -58,7 +58,7 @@ class Result extends Component {
       })
       .then( async (response) => {
         const code = response.status
-        if(code === 201){
+        if(code == 201){
           this.setState({frSent : true});
         }
         else{
@@ -70,7 +70,8 @@ class Result extends Component {
       })
     }
   
-    removeFriend = async (userID) =>{ //This is actually useless since the API doesnt let you delete friends, but it bugged me not to implement it
+    //This is actually useless since the API doesnt let you delete friends, but it bugged me not to implement it
+    removeFriend = async (userID) =>{ 
       fetch('http://localhost:3333/api/1.0.0/user/'+userID+'/friends/', {
         method: 'DELETE',
         headers: {
@@ -79,7 +80,7 @@ class Result extends Component {
       })
       .then( async (response) => {
         const code = response.status
-        if(code === 200){
+        if(code == 200){
           this.setState({frSent : false, friends: false});
         }
         else{
@@ -110,7 +111,7 @@ class Result extends Component {
             }} borderWidth='2' borderColor='darkBlue.600' marginTop={2} marginBottom={2} />
             </Pressable>
             <Text>{this.state.fName} {this.state.lName}</Text>
-            {this.state.frSent === false? <IconButton ml={'auto'} size={'lg'} onPress={() => {this.state.friends === false ? this.addFriend(this.state.userID) : this.removeFriend(this.state.userID)}}  icon={<Ionicons name={this.state.friends === false ? 'person-add' : 'person-remove'} color='DarkBlue' />} />:<Text fontSize={'s'} color='success.600' >Friend Request Sent</Text> }
+            {this.state.frSent == false? <IconButton ml={'auto'} size={'lg'} onPress={() => {this.state.friends == false ? this.addFriend(this.state.userID) : this.removeFriend(this.state.userID)}}  icon={<Ionicons name={this.state.friends == false ? 'person-add' : 'person-remove'} color='DarkBlue' />} />:<Text fontSize={'s'} color='success.600' >Friend Request Sent</Text> }
           </HStack>
   
         </Box>

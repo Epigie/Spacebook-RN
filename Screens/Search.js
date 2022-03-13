@@ -33,7 +33,7 @@ class Search extends Component {
 
   searchPeople = async (search) => {
     this.setState({isLoading : true})
-    fetch('http://localhost:3333/api/1.0.0/search?='+encodeURIComponent(search), {
+    fetch('http://localhost:3333/api/1.0.0/search?q='+encodeURIComponent(search), {
       method: 'GET',
       headers: {
         'X-Authorization' : this.state.AuthToken,
@@ -111,7 +111,7 @@ class Search extends Component {
 
   }
 
-   //Post Functions
+  //  Post Functions
    postToWall = async (id) => {
     const post = this.state.postText;
     fetch('http://localhost:3333/api/1.0.0/user/'+id+'/post', {
@@ -172,7 +172,7 @@ class Search extends Component {
     })
   }
 
-  //Intiial Storage Function
+  //  Intiial Storage Function
 
   storeValues = async () =>{
     const id = await AsyncStorage.getItem('@USERID');
@@ -230,13 +230,13 @@ class Search extends Component {
                 <Modal.CloseButton />
                 <Modal.Header>User Profile</Modal.Header>
                 <Modal.Body>
-                  {this.state.modalUserInfo !== null? <Heading marginBottom={5} alignSelf={'center'}>{this.state.modalUserInfo.first_name} {this.state.modalUserInfo.last_name}</Heading>: <></>}
-                  {this.state.modalUserPicture !== null ? <Avatar borderWidth='2' borderColor='darkBlue.900'source={{uri: this.state.modalUserPicture}} size="xl" resizeMode="center" alignSelf={'center'} marginBottom='5' /> :<></>}
-                  {this.state.modalUserInfo !== null? <HStack space={2} alignSelf={'center'} justifyContent={'center'}><Text marginBottom={2} marginTop={5} bold>Email: </Text><Text marginBottom={2} marginTop={5} >{this.state.modalUserInfo.email}</Text></HStack>: <></>}
-                  {this.state.modalUserInfo !== null? <TextArea borderColor='darkBlue.900' borderWidth='2' mt='5' placeholder='Houston we have lift off!' w={{base: "100%"}} onChangeText={(value) => this.setState({postText: value})} ></TextArea> : <></> }
-                  {this.state.modalUserInfo !== null? <Button mt='5' alignSelf='flex-end' onPress={() => this.postToWall(this.state.modalUserID)} >Post</Button>: <></>}
-                  {this.state.postData !== null? <Box width='100%' borderBottomWidth='2' borderColor='darkBlue.600'><Heading color='dark.50' bold ml='5' >Your Wall</Heading></Box>: <></>}
-                  {this.state.postData !== null? <ScrollView><FlatList extraData={this.state} data={this.state.postData} renderItem={this.renderPost} keyExtractor={item => item.post_id}></FlatList> </ScrollView>:<></>}
+                  {this.state.modalUserInfo != null? <Heading marginBottom={5} alignSelf={'center'}>{this.state.modalUserInfo.first_name} {this.state.modalUserInfo.last_name}</Heading>: <></>}
+                  {this.state.modalUserPicture != null ? <Avatar borderWidth='2' borderColor='darkBlue.900'source={{uri: this.state.modalUserPicture}} size="xl" resizeMode="center" alignSelf={'center'} marginBottom='5' /> :<></>}
+                  {this.state.modalUserInfo != null? <HStack space={2} alignSelf={'center'} justifyContent={'center'}><Text marginBottom={2} marginTop={5} bold>Email: </Text><Text marginBottom={2} marginTop={5} >{this.state.modalUserInfo.email}</Text></HStack>: <></>}
+                  {this.state.modalUserInfo != null? <TextArea borderColor='darkBlue.900' borderWidth='2' mt='5' placeholder='Houston we have lift off!' w={{base: "100%"}} onChangeText={(value) => this.setState({postText: value})} ></TextArea> : <></> }
+                  {this.state.modalUserInfo != null? <Button mt='5' alignSelf='flex-end' onPress={() => this.postToWall(this.state.modalUserID)} >Post</Button>: <></>}
+                  {this.state.postData != null? <Box width='100%' borderBottomWidth='2' borderColor='darkBlue.600'><Heading color='dark.50' bold ml='5' >Your Wall</Heading></Box>: <></>}
+                  {this.state.postData != null? <ScrollView><FlatList extraData={this.state} data={this.state.postData} renderItem={this.renderPost} keyExtractor={item => item.post_id}></FlatList> </ScrollView>:<></>}
                 </Modal.Body>
               </Modal.Content>
             </Modal>
@@ -251,7 +251,7 @@ class Search extends Component {
             </VStack>
         </Box>
       <ScrollView>
-        {this.state.isLoading === false? <FlatList extraData={this.state} data={this.state.results} keyExtractor={item => item.user_id} contentContainerStyle={{ flexGrow: 1 }} renderItem={this.renderResult}/>: <Spinner alignSelf={'center'} color={'darkBlue.900'} size={'lg'}/>}
+        {this.state.isLoading == false? <FlatList extraData={this.state} data={this.state.results} keyExtractor={item => item.user_id} contentContainerStyle={{ flexGrow: 1 }} renderItem={this.renderResult}/>: <Spinner alignSelf={'center'} color={'darkBlue.900'} size={'lg'}/>}
         
 
       </ScrollView>
